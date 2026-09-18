@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction History - Forest Fire Prediction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="brand-section">
+            <div class="brand">
+                <h1><a href="/">Forest Fire Prediction</a></h1>
+            </div>
+        </div>
+        <div class="header-links">
+            <span>Welcome, {{ session.get('user_name') }}</span>
+            <a href="/">New Prediction</a>
+            <a href="/logout">Log out</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="table-container animate-fade-up">
+            <div class="table-header">
+                <h2>Your Prediction History</h2>
+            </div>
+            
+            <div class="table-wrapper">
+                {% if history %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>District</th>
+                            <th>Temp (&deg;C)</th>
+                            <th>Humidity (%)</th>
+                            <th>Wind (km/h)</th>
+                            <th>Prediction</th>
+                            <th>Probability</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in history %}
+                        <tr class="delay-{{ loop.index0 % 3 }}00 animate-fade-up">
+                            <td style="color: var(--text-muted);">{{ record.created_at.strftime('%b %d, %Y %I:%M %p') }}</td>
+                            <td style="font-weight: 600;">{{ record.district }}</td>
+                            <td>{{ record.temperature }}</td>
+                            <td>{{ record.humidity }}</td>
+                            <td>{{ record.wind_speed }}</td>
+                            <td>
+                                {% if record.prediction == 'Fire' %}
+                                    <span class="badge badge-risk">{{ record.prediction }}</span>
+                                {% else %}
+                                    <span class="badge badge-safe">{{ record.prediction }}</span>
+                                {% endif %}
+                            </td>
+                            <td style="font-weight: 600;">{{ "%.2f"|format(record.prediction_probability) }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-clipboard-list" style="font-size: 3rem; margin-bottom: 1.5rem; color: #c9cccf;"></i>
+                    <p>You haven't made any predictions yet.</p>
+                    <a href="/" class="btn btn-primary" style="display: inline-flex; width: auto;">Make a Prediction</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>Powered by <a href="https://github.com/Blacksujit" target="_blank" rel="noopener">Forest Fire Prediction System</a></p>
+    </footer>
+</body>
+</html>

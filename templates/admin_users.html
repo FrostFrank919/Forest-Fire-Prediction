@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Admin Panel - Forest Fire Prediction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="brand-section">
+            <div class="brand">
+                <h1><a href="/">Forest Fire Prediction</a></h1>
+            </div>
+        </div>
+        <div class="header-links">
+            <span>Admin: {{ session.get('user_name') }}</span>
+            <a href="/">New Prediction</a>
+            <a href="/logout">Log out</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="table-container animate-fade-up">
+            <div class="table-header">
+                <h2>User Management Console</h2>
+            </div>
+            
+            <div class="table-wrapper">
+                {% if users %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr class="delay-{{ loop.index0 % 3 }}00 animate-fade-up">
+                            <td style="color: var(--text-muted); font-weight: 600;">#{{ u.id }}</td>
+                            <td style="font-weight: 600;">{{ u.name }}</td>
+                            <td style="color: var(--text-muted);">{{ u.email }}</td>
+                            <td>
+                                {% if u.role == 'admin' %}
+                                    <span class="badge badge-admin">{{ u.role }}</span>
+                                {% else %}
+                                    <span class="badge badge-user">{{ u.role }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/admin/users/{{ u.id }}/history" class="btn btn-outline" style="height: 2.2rem; padding: 0 0.8rem; font-size: 0.85rem; width: auto;">
+                                    <i class="fas fa-history" style="margin-right: 0.4rem;"></i> View History
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <p>No users found in the system.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>Powered by <a href="https://github.com/Blacksujit" target="_blank" rel="noopener">Forest Fire Prediction System</a></p>
+    </footer>
+</body>
+</html>

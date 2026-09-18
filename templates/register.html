@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up - Forest Fire Prediction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="brand-section">
+            <div class="brand">
+                <h1><a href="/">Forest Fire Prediction</a></h1>
+            </div>
+            <p class="tagline">Risk assessment from live environmental data</p>
+        </div>
+        <div class="header-links">
+            <a href="/login" class="btn btn-outline" style="height: 2.2rem; padding: 0 0.8rem; font-size: 0.85rem;">Log in</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card auth-card animate-fade-up">
+            <div class="card-title">Create an account</div>
+            <div class="card-description">Sign up to get started with risk predictions</div>
+            
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <div class="flash-message error">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+            
+            <form action="/register" method="POST">
+                <div class="field">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">Sign up</button>
+            </form>
+            
+            <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+                Already have an account? <a href="/login" class="link">Log in</a>
+            </p>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>Powered by <a href="https://github.com/Blacksujit" target="_blank" rel="noopener">Forest Fire Prediction System</a></p>
+    </footer>
+</body>
+</html>
