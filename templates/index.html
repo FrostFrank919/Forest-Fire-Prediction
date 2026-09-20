@@ -51,12 +51,7 @@
             {% endif %}
 
             <form id="prediction-form" {% if not user_id %}onsubmit="event.preventDefault(); window.location.href='/login';"{% endif %} style="margin-top: 2rem;">
-                <div class="field">
-                    <label for="location">District</label>
-                    <select id="location" name="location" required>
-                        <option value="" disabled selected>Select a district</option>
-                    </select>
-                </div>
+
 
                 <div class="field-grid">
                     <div class="field">

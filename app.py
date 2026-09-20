@@ -20,8 +20,7 @@ def get_db_connection():
 with open('./model/model.pkl', 'rb') as f:
     model = pickle.load(f)
 
-with open('./model/locations.json', 'r') as f:
-    locations_dict = json.load(f)
+
 
 @app.route('/')
 def home():
@@ -101,9 +100,7 @@ def history():
         
     return render_template('history.html', history=history_records)
 
-@app.route('/get_locations', methods=['GET'])
-def get_locations():
-    return jsonify(list(locations_dict.keys()))
+
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -113,10 +110,9 @@ def predict():
     try:
         data = request.get_json(force=True)
 
-        location_str = data.get('location', 'Unknown')
-        location_encoded = locations_dict.get(location_str, 0)
 
-        features = [location_encoded, data['temp'], data['RH'], data['wind']]
+
+        features = [data['temp'], data['RH'], data['wind']]
         features_array = np.array(features).reshape(1, -1)
 
         model_obj = model['model']
@@ -129,33 +125,33 @@ def predict():
         result = {
             'fire': bool(prediction[0]),
             'probability': prediction_proba.tolist(),
-            'accuracy': model_obj.score(features_array, [prediction[0]])
+            'accuracy': 0.8588
         }
 
-        try:
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            query = """
-            INSERT INTO prediction_history (user_id, district, temperature, humidity, wind_speed, prediction, prediction_probability) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """
-            prediction_label = "Fire" if prediction[0] else "No Fire"
-            max_prob = float(max(prediction_proba)) * 100
-            
-            cursor.execute(query, (
-                session['user_id'], 
-                location_str, 
-                float(data['temp']), 
-                float(data['RH']), 
-                float(data['wind']), 
-                prediction_label, 
-                max_prob
-            ))
-            conn.commit()
-            cursor.close()
-            conn.close()
-        except mysql.connector.Error as err:
-            print(f"Error saving prediction: {err}")
+        if 'user_id' in session:
+            try:
+                conn = get_db_connection()
+                cursor = conn.cursor()
+                query = """
+                INSERT INTO prediction_history (user_id, temperature, humidity, wind_speed, prediction, prediction_probability) 
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """
+                prediction_label = "Fire" if prediction[0] else "No Fire"
+                max_prob = float(max(prediction_proba)) * 100
+                
+                cursor.execute(query, (
+                    session['user_id'], 
+                    float(data['temp']), 
+                    float(data['RH']), 
+                    float(data['wind']), 
+                    prediction_label, 
+                    max_prob
+                ))
+                conn.commit()
+                cursor.close()
+                conn.close()
+            except mysql.connector.Error as err:
+                print(f"Error saving prediction: {err}")
 
         return jsonify(result)
 

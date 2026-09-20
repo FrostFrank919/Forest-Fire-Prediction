@@ -1,13 +1,6 @@
 $(document).ready(function () {
-    // Fetch dynamic locations for dropdown
-    $.get('/get_locations', function (locations) {
-        var $locationSelect = $('#location');
-        locations.forEach(function (loc) {
-            $locationSelect.append($('<option></option>').val(loc).text(loc));
-        });
-    }).fail(function (err) {
-        console.log("Failed to load locations: ", err);
-    });
+
+
 
     var $pointer = $('#scale-pointer');
     var $caption = $('#scale-caption');
@@ -16,7 +9,6 @@ $(document).ready(function () {
         event.preventDefault();
 
         var formData = {
-            'location': $('#location').val(),
             'temp': $('#temp').val(),
             'RH': $('#RH').val(),
             'wind': $('#wind').val()
@@ -31,13 +23,19 @@ $(document).ready(function () {
                 var probabilityPct = response.probability[1] * 100;
                 var accuracyPct = (response.accuracy * 100).toFixed(2);
 
-                // Slide the danger-scale pointer to the predicted probability
+
                 $pointer.css('left', probabilityPct + '%').addClass('active');
                 $caption.text('Predicted fire probability: ' + probabilityPct.toFixed(2) + '%');
 
-                var verdictClass = response.fire ? 'is-risk' : 'is-safe';
-                var icon = response.fire ? 'fa-exclamation-triangle' : 'fa-leaf';
-                var title = response.fire ? 'Fire risk detected' : 'Low fire risk';
+                var riskLevel = "Low";
+                if (probabilityPct >= 20 && probabilityPct < 40) riskLevel = "Moderate";
+                else if (probabilityPct >= 40 && probabilityPct < 60) riskLevel = "High";
+                else if (probabilityPct >= 60 && probabilityPct < 80) riskLevel = "Very High";
+                else if (probabilityPct >= 80) riskLevel = "Extreme";
+
+                var verdictClass = probabilityPct >= 50 ? 'is-risk' : 'is-safe';
+                var icon = probabilityPct >= 50 ? 'fa-exclamation-triangle' : 'fa-leaf';
+                var title = riskLevel + ' Fire Risk';
 
                 var html =
                     '<div class="result-verdict ' + verdictClass + '">' +
@@ -70,7 +68,7 @@ $(document).ready(function () {
         });
     });
 
-    // Custom spin button logic
+
     $('.spin-up').click(function () {
         var $input = $(this).closest('.number-wrapper').find('input');
         var val = parseFloat($input.val()) || 0;
